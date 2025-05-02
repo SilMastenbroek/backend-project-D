@@ -54,3 +54,4 @@ secrets.json
 
 # JetBrains Rider
 *.sln.iml
+/.vs
