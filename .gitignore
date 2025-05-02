@@ -20,6 +20,7 @@ ScaffoldingReadMe.txt
 # Environment files
 .env
 appsettings.*.json
+appsettings.json
 
 # Rider project files
 .idea/
