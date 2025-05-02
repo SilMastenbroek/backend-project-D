@@ -11,8 +11,6 @@ namespace ExecuteTasksWorkflow
 
         public static async Task InitAsync()
         {
-            AssistantId = "asst_xxx"; // Jouw OpenAI Assistant ID
-            var apiKey = "sk-xxx";    // Jouw API key
 
             var ai = new AIAssistant(apiKey, AssistantId);
             ThreadId = await ai.CreateThreadAsync();
