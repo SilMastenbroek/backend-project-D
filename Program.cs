@@ -1,7 +1,21 @@
-public class Program
+var builder = WebApplication.CreateBuilder(args);
+
+// Add MVC controller support
+builder.Services.AddControllers();
+
+// Add Swagger services
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
 {
-    static void Main()
-    {
-        System.Console.WriteLine("Dit is een test");
-    }
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+app.MapControllers();
+
+app.Run();
