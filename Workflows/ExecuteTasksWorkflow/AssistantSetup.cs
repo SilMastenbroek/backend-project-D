@@ -12,8 +12,6 @@ namespace ExecuteTasksWorkflow
         public static async Task InitAsync()
         {
 
-            var ai = new AIAssistant(apiKey, AssistantId);
-            ThreadId = await ai.CreateThreadAsync();
 
             // Standaard instructies voor deze workflow
             string instructions = string.Join("\n", new[]
