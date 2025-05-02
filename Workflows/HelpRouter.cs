@@ -5,7 +5,7 @@ public class HelpRouter
         switch (helpType)
         {
             case HelpType.ExecuteTasks:
-                new ExecuteTasksWorkflow().Run();
+                new ExecuteTasksWorkflow().RunAsync();
                 break;
             case HelpType.CreateTasks:
                 new CreateTasksWorkflow().Run();
