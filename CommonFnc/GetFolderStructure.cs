@@ -20,12 +20,12 @@ public static class GetFolderStructure
 
     public static string FromConsole()
     {
-        Console.Write("📁 Voer het projectpad in: ");
+        Console.Write("Voer het projectpad in: ");
         var input = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(input) || !Directory.Exists(input))
         {
-            Console.WriteLine("❌ Ongeldig pad.");
+            Console.WriteLine("Ongeldig pad.");
             return "";
         }
 
