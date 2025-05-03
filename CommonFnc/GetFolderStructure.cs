@@ -20,12 +20,12 @@ public static class GetFolderStructure
 
     public static string FromConsole()
     {
-        Console.Write("Voer het projectpad in: ");
+        Console.Write("📁 Voer het projectpad in: ");
         var input = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(input) || !Directory.Exists(input))
         {
-            Console.WriteLine("Ongeldig pad.");
+            Console.WriteLine("❌ Ongeldig pad.");
             return "";
         }
 
@@ -35,34 +35,34 @@ public static class GetFolderStructure
     public static string BuildTree(string rootPath)
     {
         var sb = new StringBuilder();
-        Traverse(rootPath, sb, "", true);
+        var rootName = new DirectoryInfo(rootPath).Name;
+        sb.AppendLine($"/{rootName}/");
+        Traverse(rootPath, sb, indentLevel: 1);
         return sb.ToString();
     }
 
-    private static void Traverse(string path, StringBuilder sb, string indent, bool isLast)
+    private static void Traverse(string path, StringBuilder sb, int indentLevel)
     {
+        var indent = new string(' ', indentLevel * 4);
         var dir = new DirectoryInfo(path);
+
         if (IgnoredFolders.Contains(dir.Name)) return;
 
-        sb.AppendLine($"{indent}{(isLast ? "└──" : "├──")} {dir.Name}");
-        indent += isLast ? "    " : "│   ";
-
-        var subDirs = dir.GetDirectories();
-        var files = dir.GetFiles();
-
-        int fileCount = 0;
-        for (int i = 0; i < subDirs.Length; i++)
+        // Subfolders
+        foreach (var subDir in dir.GetDirectories())
         {
-            Traverse(subDirs[i].FullName, sb, indent, i == subDirs.Length - 1 && files.Length == 0);
+            if (IgnoredFolders.Contains(subDir.Name)) continue;
+
+            sb.AppendLine($"{indent}{subDir.Name}/");
+            Traverse(subDir.FullName, sb, indentLevel + 1);
         }
 
-        for (int i = 0; i < files.Length; i++)
+        // Files
+        foreach (var file in dir.GetFiles())
         {
-            if (IgnoredExtensions.Contains(files[i].Extension)) continue;
+            if (IgnoredExtensions.Contains(file.Extension)) continue;
 
-            var prefix = (i == files.Length - 1) ? "└──" : "├──";
-            sb.AppendLine($"{indent}{prefix} {files[i].Name}");
-            fileCount++;
+            sb.AppendLine($"{indent}{file.Name}");
         }
     }
 }
