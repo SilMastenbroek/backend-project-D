@@ -1,33 +1,29 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using AIWorkflow;
 
-namespace ExecuteTasksWorkflow
+namespace ExecuteTasksWorkflow;
+
+public static class AssistantSetup
 {
-    public static class AssistantSetup
+    public static AIAssistant AssistantInstance { get; private set; }
+    public static string AssistantId { get; private set; }
+    public static string ThreadId { get; private set; }
+
+    public static async Task InitAsync(string assistantKey)
     {
-        public static AIAssistant AssistantInstance { get; private set; }
-        public static string AssistantId { get; private set; }
-        public static string ThreadId { get; private set; }
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
 
-        public static async Task InitAsync()
-        {
+        var apiKey = config["OpenAI:ApiKey"];
+        AssistantId = config[$"OpenAI:Assistants:{assistantKey}"];
 
-            var ai = new AIAssistant(apiKey, AssistantId);
-            ThreadId = await ai.CreateThreadAsync();
+        if (string.IsNullOrWhiteSpace(AssistantId))
+            throw new Exception($"❌ Assistant ID '{assistantKey}' niet gevonden in config.");
 
-            // Standaard instructies voor deze workflow
-            string instructions = string.Join("\n", new[]
-            {
-                "Je bent een technische AI-assistent.",
-                "Help met het uitvoeren van programmeertaken.",
-                "Wees kort, helder en technisch precies.",
-                "Vraag door als context ontbreekt."
-            });
-
-            await ai.AddMessageAsync("📌 Workflow instructies:\n" + instructions);
-
-            AssistantInstance = ai;
-        }
+        var assistant = new AIAssistant(apiKey, AssistantId);
+        ThreadId = await assistant.CreateThreadAsync();
+        AssistantInstance = assistant;
     }
 }
-

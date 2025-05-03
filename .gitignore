@@ -10,6 +10,7 @@ obj/
 
 # Visual Studio Code settings
 .vscode/
+.vs/
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt

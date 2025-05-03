@@ -57,18 +57,18 @@ internal class TrelloService
         var tasks = await GetAllTasksAsync();
         if (tasks.Count == 0)
         {
-            Console.WriteLine("❌ Geen Trello-taken gevonden.");
+            Console.WriteLine("Geen Trello-taken gevonden.");
             return null;
         }
 
-        Console.WriteLine("📋 Selecteer een taak:");
+        Console.WriteLine("Selecteer een taak:");
         for (int i = 0; i < tasks.Count; i++)
             Console.WriteLine($"{i + 1}. [{tasks[i].ListName}] {tasks[i].TaskName}");
 
         Console.Write("Keuze: ");
         if (!int.TryParse(Console.ReadLine(), out int choice) || choice < 1 || choice > tasks.Count)
         {
-            Console.WriteLine("❌ Ongeldige keuze. Eerste taak geselecteerd.");
+            Console.WriteLine("Ongeldige keuze. Eerste taak geselecteerd.");
             choice = 1;
         }
 

@@ -1,6 +1,6 @@
 
 namespace AIWorkflow;
-public class AiService : IAsyncDisposable
+public class AiService
 {
     private readonly AIAssistant _assistant;
     private readonly AIQuickChat _quick;
@@ -15,10 +15,7 @@ public class AiService : IAsyncDisposable
     public async Task<string> CreateThreadAsync() => await _assistant.CreateThreadAsync();
     public async Task AddMessageAsync(string message) => await _assistant.AddMessageAsync(message);
     public async Task<string> RunThreadAsync() => await _assistant.RunAsync();
-    public string GetThreadId() => _assistant.CurrentThreadId;
 
     // Quick chat
     public async Task<string> AskQuickAsync(string question) => await _quick.AskAsync(question);
-
-    public async ValueTask DisposeAsync() => await _assistant.DisposeAsync();
 }

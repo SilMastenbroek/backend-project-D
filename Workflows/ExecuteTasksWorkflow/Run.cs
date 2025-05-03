@@ -12,27 +12,27 @@ namespace ExecuteTasksWorkflow
             Console.WriteLine("Execute Task Workflow gestart...\n");
 
             // 🧠 Initieer AI-assistent en thread
-            await AssistantSetup.InitAsync();
-            var ai = AssistantSetup.AssistantInstance;
+            await AssistantSetup.InitAsync("Execute");
+            var assistant = AssistantSetup.AssistantInstance;
             var threadId = AssistantSetup.ThreadId;
 
             Console.WriteLine("Thread ID: " + threadId + "\n");
 
-            // 📁 Vraag folderstructuur op via console
+            //Vraag folderstructuur op via console
             string folder = GetFolderStructure.FromConsole();
 
-            // ✅ Vraag Trello-taak op via console
+            //Vraag Trello-taak op via console
             string task = await GetTrelloTask.FromConsoleAsync();
 
-            // ➕ Voeg context toe aan de AI-thread
-            await ai.AddMessageAsync("Folderstructuur:\n" + folder);
-            await ai.AddMessageAsync("Trello taak:\n" + task);
-            await ai.AddMessageAsync("Zullen we samen deze taak aanpakken?");
+            //Voeg context toe aan de AI-thread
+            await assistant.AddMessageAsync("Folderstructuur:\n" + folder);
+            await assistant.AddMessageAsync("Trello taak:\n" + task);
+            await assistant.AddMessageAsync("Zullen we samen deze taak aanpakken?");
 
-            // 🚀 Start de AI-run
-            string reactie = await ai.RunAsync();
+            //Start de AI-run
+            string reactie = await assistant.RunAsync();
 
-            Console.WriteLine("\n🤖 AI Reactie:\n" + reactie);
+            Console.WriteLine("\nAI Reactie:\n" + reactie);
         }
     }
 }
