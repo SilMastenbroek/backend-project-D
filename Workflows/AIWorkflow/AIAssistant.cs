@@ -41,9 +41,24 @@ public class AIAssistant
         if (_threadId == null) throw new Exception("Thread not initialized");
 
         var payload = new { role = "user", content };
-        var body = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-        await _httpClient.PostAsync($"threads/{_threadId}/messages", body);
+
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = false,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+
+        var json = JsonSerializer.Serialize(payload, options);
+        var body = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PostAsync($"threads/{_threadId}/messages", body);
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Failed to add message: {error}");
+        }
     }
+
 
     public async Task<string> RunAsync()
     {

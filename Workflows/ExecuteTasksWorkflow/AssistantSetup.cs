@@ -20,7 +20,7 @@ public static class AssistantSetup
         AssistantId = config[$"OpenAI:Assistants:{assistantKey}"];
 
         if (string.IsNullOrWhiteSpace(AssistantId))
-            throw new Exception($"❌ Assistant ID '{assistantKey}' niet gevonden in config.");
+            throw new Exception($"Assistant ID '{assistantKey}' niet gevonden in config.");
 
         var assistant = new AIAssistant(apiKey, AssistantId);
         ThreadId = await assistant.CreateThreadAsync();
