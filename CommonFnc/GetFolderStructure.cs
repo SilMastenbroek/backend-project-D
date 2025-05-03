@@ -21,7 +21,13 @@ public static class GetFolderStructure
     public static string FromConsole()
     {
         Console.Write("Voer het projectpad in: ");
-        var input = Console.ReadLine();
+        // var input = Console.ReadLine();
+
+        // TODO: Later weghalen is voor backend te testen
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+        string input = config["FolderStructure:Path"];
 
         if (string.IsNullOrWhiteSpace(input) || !Directory.Exists(input))
         {
