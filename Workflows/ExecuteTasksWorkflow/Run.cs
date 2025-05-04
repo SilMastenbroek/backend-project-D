@@ -47,8 +47,9 @@ namespace ExecuteTasksWorkflow
                 }
                 else if (reactie_gebruiker == "ja")
                 {
-                    await assistant.AddMessageAsync(reactie_gebruiker);
-
+                    
+                    var _aanThread = Console.ReadLine()?.Trim().ToLower();
+                    await assistant.AddMessageAsync(_aanThread);
                     string reactie2 = await assistant.RunAsync();
                     Console.WriteLine("\nAI Reactie:\n" + reactie2);
                 }
