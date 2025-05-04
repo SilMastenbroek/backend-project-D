@@ -24,6 +24,20 @@ namespace ExecuteTasksWorkflow
             //Vraag Trello-taak op via console
             string task = await GetTrelloTask.FromConsoleAsync();
 
+            // Controleer op README-bestand in de folder
+            string? readme = ReadmeHelper.GetReadmeContents(folder);
+
+            if (readme != null)
+            {
+                Console.WriteLine("📄 README gevonden en toegevoegd aan AI-assistent.");
+                await assistant.AddMessageAsync("Inhoud van README:\n" + readme);
+            } 
+            else
+            {
+                Console.WriteLine("❌ Geen README gevonden.");
+                return;
+            }
+
             //Voeg context toe aan de AI-thread
             await assistant.AddMessageAsync("Folderstructuur:\n" + folder);
             await assistant.AddMessageAsync("Trello taak:\n" + task);
