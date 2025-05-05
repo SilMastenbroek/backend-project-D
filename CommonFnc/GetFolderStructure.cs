@@ -18,24 +18,18 @@ public static class GetFolderStructure
         ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mp3", ".webp", ".pdf", ".ico"
     };
 
-    public static string FromConsole()
+    public static string FromConsole(string folderPath = "")
     {
         Console.Write("Voer het projectpad in: ");
         // var input = Console.ReadLine();
 
-        // TODO: Later weghalen is voor backend te testen
-        var config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-        string input = config["FolderStructure:Path"];
-
-        if (string.IsNullOrWhiteSpace(input) || !Directory.Exists(input))
+        if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
         {
             Console.WriteLine("Ongeldig pad.");
             return "";
         }
 
-        return BuildTree(input);
+        return BuildTree(folderPath);
     }
 
     public static string BuildTree(string rootPath)

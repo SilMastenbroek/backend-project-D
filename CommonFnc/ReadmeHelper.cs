@@ -7,12 +7,6 @@ namespace CommonFnc
     {
         public static string? GetReadmeContents(string folderPath)
         {
-            if (!Directory.Exists(folderPath))
-            {
-                Console.WriteLine("Map bestaat niet.");
-                return null;
-            }
-
             var files = Directory.GetFiles(folderPath);
             foreach (var file in files)
             {

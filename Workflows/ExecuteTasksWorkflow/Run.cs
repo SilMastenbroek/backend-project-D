@@ -19,18 +19,22 @@ namespace ExecuteTasksWorkflow
             Console.WriteLine("Thread ID: " + threadId + "\n");
 
             //Vraag folderstructuur op via console
-            string folder = GetFolderStructure.FromConsole();
+            var configHelper = new ConfigurationHelper(); // Haalt data op uit appsettings.json via Helper functie
+            string filePath = configHelper.GetFolderPath(); // Haalt het projectpad op uit appsettings.json
+            string folder = GetFolderStructure.FromConsole(filePath); // Later uitzoeken hoe we dit netjes oppakken in frontend
 
             //Vraag Trello-taak op via console
             string task = await GetTrelloTask.FromConsoleAsync();
 
             // Controleer op README-bestand in de folder
-            string? readme = ReadmeHelper.GetReadmeContents(folder);
+            string? readme = ReadmeHelper.GetReadmeContents(filePath);
 
             if (readme != null)
             {
                 Console.WriteLine("📄 README gevonden en toegevoegd aan AI-assistent.");
-                await assistant.AddMessageAsync("Inhoud van README:\n" + readme);
+                System.Console.WriteLine("Inhoud van README:\n" + readme);
+                return;
+                // await assistant.AddMessageAsync("Inhoud van README:\n" + readme);
             } 
             else
             {
