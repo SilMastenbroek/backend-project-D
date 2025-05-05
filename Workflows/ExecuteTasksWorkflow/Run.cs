@@ -7,6 +7,8 @@ namespace ExecuteTasksWorkflow
 {
     public static class Run
     {
+        private static ConfigurationHelper configHelper = new ConfigurationHelper(); // Haalt data op uit appsettings.json via Helper functie
+
         public static async Task StartAsync()
         {
             Console.WriteLine("Execute Task Workflow gestart...\n");
@@ -18,8 +20,7 @@ namespace ExecuteTasksWorkflow
 
             Console.WriteLine("Thread ID: " + threadId + "\n");
 
-            //Vraag folderstructuur op via console
-            var configHelper = new ConfigurationHelper(); // Haalt data op uit appsettings.json via Helper functie
+            // Vraag de gebruiker om een projectpad en folderstructuur
             string filePath = configHelper.GetFolderPath(); // Haalt het projectpad op uit appsettings.json
             string folder = GetFolderStructure.FromConsole(filePath); // Later uitzoeken hoe we dit netjes oppakken in frontend
 
@@ -27,7 +28,7 @@ namespace ExecuteTasksWorkflow
             string task = await GetTrelloTask.FromConsoleAsync();
 
             // Controleer op README-bestand in de folder
-            string? readme = ReadmeHelper.GetReadmeContents(filePath);
+            string? readme = ReadmeHelper.GetReadmeContents(folder);
 
             if (readme != null)
             {
@@ -63,10 +64,7 @@ namespace ExecuteTasksWorkflow
                 string toestemmingPrompt = "Het volgende bericht geeft de gebruiker aan jou om toestemming te geven om class & method lines te gebruiken. Jij moet hieruit concluderen of de gebruiker toestemming geeft. Andwoord met ja als de gebruiker toestemming geeft en antwoord nee als de gebruiker geen toestemming geeft, LET OP VOEG NIKS EXTRA's TOE ALLEEN JA OF NEE ALS ANTWOORD. Hier het response van de gebruiker: " + toestemming;
 
                 // Gebruik AIQuickChat
-                var config = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json")
-                    .Build();
-                var quickchat = new AIQuickChat(config["OpenAI:ApiKey"]);
+                var quickchat = new AIQuickChat(configHelper.GetOpenAiApiKey());
                 string quickReply = await quickchat.AskAsync(toestemmingPrompt);
                 string response = quickReply.Trim().ToLower();
 
@@ -111,15 +109,11 @@ namespace ExecuteTasksWorkflow
 
 
             // TODO: Hier kan je de AIQuickChat functionaliteit aanroepen als dat nodig is
-
-            // var config = new ConfigurationBuilder()
-            //     .AddJsonFile("appsettings.json")
-            //     .Build();
             
             // Console.WriteLine("Test: AIQuickChat");
 
             // // 🔑 Zet hier je OpenAI API key in (of laad uit config)
-            // string apiKey = config["OpenAI:ApiKey"];
+            // string apiKey = configHelper.GetOpenAiApiKey();
 
             // // Vraag om te stellen
             // string question = "Is dit een test van de quickchat?";
