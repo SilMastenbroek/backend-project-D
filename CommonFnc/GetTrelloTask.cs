@@ -18,11 +18,8 @@ public static class GetTrelloTask
 {
     public static async Task<string> FromConsoleAsync()
     {
-        var config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-
-        var service = new TrelloService(config);
+        var configHelper = new ConfigurationHelper(); // Haalt data op uit appsettings.json via Helper functie
+        var service = new TrelloService(configHelper);
         var task = await service.SelectTaskAsync();
 
         if (task == null)
@@ -44,11 +41,11 @@ internal class TrelloService
     private readonly string _boardId;
     private readonly RestClient _client;
 
-    public TrelloService(IConfiguration config)
+    public TrelloService(ConfigurationHelper config)
     {
-        _apiKey = config["Trello:ApiKey"];
-        _token = config["Trello:Token"];
-        _boardId = config["Trello:BoardId"];
+        _apiKey = config.GetTrelloApiKey();
+        _token = config.GetTrelloToken();
+        _boardId = config.GetTrelloBoardId();
         _client = new RestClient("https://api.trello.com/1");
     }
 

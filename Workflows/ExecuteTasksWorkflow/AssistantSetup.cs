@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using AIWorkflow;
+using CommonFnc;
 
 namespace ExecuteTasksWorkflow;
 
@@ -12,12 +13,9 @@ public static class AssistantSetup
 
     public static async Task InitAsync(string assistantKey)
     {
-        var config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-
-        var apiKey = config["OpenAI:ApiKey"];
-        AssistantId = config[$"OpenAI:Assistants:{assistantKey}"];
+        var configHelper = new ConfigurationHelper();
+        var apiKey = configHelper.GetOpenAiApiKey();
+        AssistantId = configHelper.GetOpenAiAssistantId(assistantKey);
 
         if (string.IsNullOrWhiteSpace(AssistantId))
             throw new Exception($"Assistant ID '{assistantKey}' niet gevonden in config.");

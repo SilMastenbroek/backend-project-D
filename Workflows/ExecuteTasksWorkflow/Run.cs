@@ -7,6 +7,8 @@ namespace ExecuteTasksWorkflow
 {
     public static class Run
     {
+        private static ConfigurationHelper configHelper = new ConfigurationHelper(); // Haalt data op uit appsettings.json via Helper functie
+
         public static async Task StartAsync()
         {
             Console.WriteLine("Execute Task Workflow gestart...\n");
@@ -18,11 +20,28 @@ namespace ExecuteTasksWorkflow
 
             Console.WriteLine("Thread ID: " + threadId + "\n");
 
-            //Vraag folderstructuur op via console
-            string folder = GetFolderStructure.FromConsole();
+            // Vraag de gebruiker om een projectpad en folderstructuur
+            string filePath = configHelper.GetFolderPath(); // Haalt het projectpad op uit appsettings.json
+            string folder = GetFolderStructure.FromConsole(filePath); // Later uitzoeken hoe we dit netjes oppakken in frontend
 
             //Vraag Trello-taak op via console
             string task = await GetTrelloTask.FromConsoleAsync();
+
+            // Controleer op README-bestand in de folder
+            string? readme = ReadmeHelper.GetReadmeContents(folder);
+
+            if (readme != null)
+            {
+                Console.WriteLine("📄 README gevonden en toegevoegd aan AI-assistent.");
+                System.Console.WriteLine("Inhoud van README:\n" + readme);
+                return;
+                // await assistant.AddMessageAsync("Inhoud van README:\n" + readme);
+            } 
+            else
+            {
+                Console.WriteLine("❌ Geen README gevonden.");
+                return;
+            }
 
             //Voeg context toe aan de AI-thread
             await assistant.AddMessageAsync("Folderstructuur:\n" + folder);
@@ -30,43 +49,81 @@ namespace ExecuteTasksWorkflow
             await assistant.AddMessageAsync("Zullen we samen deze taak aanpakken?");
 
             //Start de AI-run
-            string reactie = await assistant.RunAsync();
+            // string reactie = await assistant.RunAsync();
+             // TODO: Verwijder deze regel in productie, dit is een test om te kijken wat er gebeurt als de AI om class & method lines vraagt. Hierna kan bovenstaande weer aan
+            string reactie = "AI.RequestContext.Class & Method Lines";
+            Console.WriteLine("AI Reactie:\n" + reactie);
 
-            Console.WriteLine("\nAI Reactie:\n" + reactie);
-
-            // Loop die blijft draaien zolang de gebruiker "ja" invoert
-            while (true)
+            // Check of gevoelige data aangevraagd wordt
+            if (reactie.Contains("AI.RequestContext.Class & Method Lines"))
             {
-                Console.WriteLine("\nReageer met 'ja' om door te gaan of 'nee' om te stoppen:");
-                var reactie_gebruiker = Console.ReadLine()?.Trim().ToLower();
+                Console.WriteLine("\nDe AI vraagt toestemming om class & method lines te gebruiken, mag dit?");
+                var toestemming = Console.ReadLine();
 
-                if (reactie_gebruiker == "nee")
+                // Contextuele prompt voor quickchat
+                string toestemmingPrompt = "Het volgende bericht geeft de gebruiker aan jou om toestemming te geven om class & method lines te gebruiken. Jij moet hieruit concluderen of de gebruiker toestemming geeft. Andwoord met ja als de gebruiker toestemming geeft en antwoord nee als de gebruiker geen toestemming geeft, LET OP VOEG NIKS EXTRA's TOE ALLEEN JA OF NEE ALS ANTWOORD. Hier het response van de gebruiker: " + toestemming;
+
+                // Gebruik AIQuickChat
+                var quickchat = new AIQuickChat(configHelper.GetOpenAiApiKey());
+                string quickReply = await quickchat.AskAsync(toestemmingPrompt);
+                string response = quickReply.Trim().ToLower();
+
+                if (response.Contains("ja") || response.Contains("yes") || response.Contains("akkoord") || response.Contains("ok"))
                 {
-                    Console.WriteLine("Programma gestopt.");
-                    break;
-                }
-                else if (reactie_gebruiker == "ja")
-                {
-                    
-                    var _aanThread = Console.ReadLine()?.Trim().ToLower();
-                    await assistant.AddMessageAsync(_aanThread);
-                    string reactie2 = await assistant.RunAsync();
-                    Console.WriteLine("\nAI Reactie:\n" + reactie2);
+                    Console.WriteLine("Toestemming gegeven. Context wordt gedeeld met AI-assistent.");
+
+                    // TODO: hier voeg je de echte context toe (vervang placeholder)
+                    // string classInfo = "public class Voorbeeld { void Methode() { ... } }";
+                    // await assistant.AddMessageAsync("Class & method lines:\n" + classInfo);
                 }
                 else
                 {
-                    Console.WriteLine("Ongeldige invoer. Reageer met 'ja' of 'nee'.");
+                    Console.WriteLine("Geen toestemming. Context wordt niet gedeeld.");
                 }
             }
 
+            // TODO deze loop kan je gebruiken om de gebruiker te vragen of ze verder willen gaan met de AI-assistent
+            // Loop die blijft draaien zolang de gebruiker "ja" invoert
+            // while (true)
+            // {
+            //     Console.WriteLine("\nReageer met 'ja' om door te gaan of 'nee' om te stoppen:");
+            //     var reactie_gebruiker = Console.ReadLine()?.Trim().ToLower();
 
-            // TODO: Hier uit uit bovenstaande reactie komt de eerst reactie van de chat. De chat kan vragen stellen waarop ja en nee geantwoord kan worden zoals: AI Reactie: Op basis van de folderstructuur en de Trello-taak lijkt het erop dat we moeten controleren of er een README-bestand aanwezig is in de geselecteerde map. Als dat zo is, moeten we de inhoud gebruiken om een samenvatting te genereren via de quickchat. Als er geen README is, moeten we de gebruiker om meer context vragen. Als je akkoord bent, geef ik je per stap aan wat je moet doen om dit op te lossen. Kun je een loopje maken die blijft lopen zolang de gebruiker na een reactie "ja" reageerd, dan moet onderstaande code steeds weer uitgevoegd. Reageert de gebruiker "nee" stopt het programma
+            //     if (reactie_gebruiker == "nee")
+            //     {
+            //         Console.WriteLine("Programma gestopt.");
+            //         break;
+            //     }
+            //     else if (reactie_gebruiker == "ja")
+            //     {
+            //         await assistant.AddMessageAsync(reactie_gebruiker);
 
-            // var reactie_gebruiker = Console.ReadLine();
-            // await assistant.AddMessageAsync(reactie_gebruiker);
+            //         string reactie2 = await assistant.RunAsync();
+            //         Console.WriteLine("\nAI Reactie:\n" + reactie2);
+            //     }
+            //     else
+            //     {
+            //         Console.WriteLine("Ongeldige invoer. Reageer met 'ja' of 'nee'.");
+            //     }
+            // }
 
-            // string reactie2 = await assistant.RunAsync();
-            // Console.WriteLine("\nAI Reactie:\n" + reactie2);
+
+            // TODO: Hier kan je de AIQuickChat functionaliteit aanroepen als dat nodig is
+            
+            // Console.WriteLine("Test: AIQuickChat");
+
+            // // 🔑 Zet hier je OpenAI API key in (of laad uit config)
+            // string apiKey = configHelper.GetOpenAiApiKey();
+
+            // // Vraag om te stellen
+            // string question = "Is dit een test van de quickchat?";
+
+            // // Initialiseer quickchat en stel een vraag
+            // var quickchat = new AIQuickChat(apiKey);
+            // var response = await quickchat.AskAsync(question);
+
+            // Console.WriteLine("✅ Antwoord van OpenAI:");
+            // Console.WriteLine(response);
         }
     }
 }
